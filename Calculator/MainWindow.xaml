@@ -8,9 +8,10 @@
             <ColumnDefinition Width="135*"/>
             <ColumnDefinition Width="203*"/>
         </Grid.ColumnDefinitions>
-        <TextBox x:Name="displayTextbox" HorizontalAlignment="Left" Height="49" Margin="23,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" KeyDown="OnKeyDownHandler" Grid.ColumnSpan="2"/>
-
-        <Viewbox x:Name="buttonsbox" Margin="56,114,67,35" Stretch="Fill" Grid.ColumnSpan="2">
+        <TextBox x:Name="displayTextbox" HorizontalAlignment="Left" Height="49" Margin="23,22,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" KeyDown="OnKeyDownHandler" Grid.ColumnSpan="2" BorderThickness="2,1,1,1"/>
+		<TextBox x:Name="errorBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="290" Grid.ColumnSpan="2" Margin="23,71,0,0" SpellCheck.IsEnabled="True" BorderBrush="{x:Null}"/>
+		
+		<Viewbox x:Name="buttonsbox" Margin="56,114,67,35" Stretch="Fill" Grid.ColumnSpan="2">
             <Grid Height="145" Width="199">
                 <Button x:Name="oneButton" Content="1" HorizontalAlignment="Left" Margin="0,27,0,0" VerticalAlignment="Top" Width="34" Click="NumOpButton_Click" />
                 <Button x:Name="twoButton" Content="2" HorizontalAlignment="Left" Margin="39,27,0,0" VerticalAlignment="Top" Width="34" Click="NumOpButton_Click" />
@@ -27,12 +28,13 @@
                 <Button x:Name="addButton" Content="+" HorizontalAlignment="Left" Margin="117,54,0,0" VerticalAlignment="Top" Width="34" Click="NumOpButton_Click" />
                 <Button x:Name="divButton" Content="/" HorizontalAlignment="Left" Margin="117,27,0,0" VerticalAlignment="Top" Width="34" Click="NumOpButton_Click" />
                 <Button x:Name="multButton" Content="*" HorizontalAlignment="Left" Margin="117,0,0,0" VerticalAlignment="Top" Width="34" Click="NumOpButton_Click" />
-                <Button x:Name="calcButton" Content="=" HorizontalAlignment="Left" Margin="117,108,0,0" VerticalAlignment="Top" Width="34" Click="calcButton_Click"/>
+                <Button x:Name="calcButton" Content="=" HorizontalAlignment="Left" Margin="117,108,0,0" VerticalAlignment="Top" Width="34" Click="CalcButton_Click"/>
                 <Button x:Name="decPointButton" Content="." HorizontalAlignment="Left" Margin="78,108,0,0" VerticalAlignment="Top" Width="34" Click="NumOpButton_Click"/>
-                <Button x:Name="sqrtButton" Content="SQRT" HorizontalAlignment="Left" VerticalAlignment="Top" Width="34" Margin="156,0,0,0" Click="NumOpButton_Click"/>
-                <Button x:Name="RightParanthesisBttn" Content=")" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="33" Margin="78,0,0,125" Click="NumOpButton_Click"/>
+				<Button x:Name="RightParanthesisBttn" Content=")" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="33" Margin="78,0,0,125" Click="NumOpButton_Click"/>
                 <Button x:Name="LeftParanthesisButton" Content="(" HorizontalAlignment="Left" VerticalAlignment="Top" Width="33" Margin="40,0,0,0" Click="NumOpButton_Click"/>
-            </Grid>
+				<Button x:Name="langButton" Content="EN" HorizontalAlignment="Left" Height="20" Margin="156,0,0,0" VerticalAlignment="Top" Width="33" Click="langButton_Click"/>
+			</Grid>
         </Viewbox>
-    </Grid>
+		
+	</Grid>
 </Window>

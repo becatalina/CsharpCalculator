@@ -11,9 +11,10 @@ namespace Calculator
 
         private Regex additionSubtraction = new Regex("[+-]", RegexOptions.RightToLeft);
         private Regex multiplicationDivision = new Regex("[*/]", RegexOptions.RightToLeft);
+
         private double result;
         public void Parse(string equation)
-        {
+         {
             var operatorLocation = additionSubtraction.Match(equation);
             if (!operatorLocation.Success)
             {
@@ -26,12 +27,12 @@ namespace Calculator
                 LeftNumber.Parse(equation.Substring(0, operatorLocation.Index));
                 RightNumber = new Operation();
                 RightNumber.Parse(equation.Substring(operatorLocation.Index + 1));
+                return;
             }
-            else
-            {
-                Operator = "v";
-                result = double.Parse(equation);
-            }
+
+            Operator = "v";
+            result = double.Parse(equation);
+
         }
 
         public double Solve()

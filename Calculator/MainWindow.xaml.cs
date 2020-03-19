@@ -6,63 +6,120 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Calculator.Exceptions;
 
 namespace Calculator
 {
 
     public partial class MainWindow : Window
     {
-        private Utils cal;
-        private Calc calculator = new Calc();
+        public bool IsRo { get; set; } = false;
         public MainWindow()
         {
-            cal = new Utils();
-            
             InitializeComponent();
             displayTextbox.CaretBrush = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0)); 
-         
-            
+  
         }
 
 
         private void NumOpButton_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            displayTextbox.Text += button.Content.ToString();
-        }
+            try
+            {
+                ValidateInput(button.Content.ToString());
+                displayTextbox.Text += button.Content.ToString();
 
+                var input = displayTextbox.Text.ToString();
+                Utils.AddComma(ref input, IsRo);
+
+                displayTextbox.Text = input;
+                errorBox.Text = "";
+            }
+            catch (InvalidOperatorExxception ex)
+            {
+                errorBox.Text = ex.Message;
+                return;
+            }
+            catch (InvalidInputException ex)
+            {
+                errorBox.Text = ex.Message;
+                return;
+            }
+            catch (NotANumberException ex)
+            {
+                errorBox.Text = ex.Message;
+                return;
+            }
+            catch (InvalidParanthesisException ex) {
+                errorBox.Text = ex.Message;
+                return;
+            }
+            
+        }
         private void OnKeyDownHandler(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter)
             {
                 try
                 {
-                    Calculate();
+                    displayTextbox.Text = Utils.Solve(displayTextbox.Text).ToString(); 
+                    return;
                 }
                 catch (DivideByZeroException ex)
                 {
-                    displayTextbox.Text = "Cannot divide by zero";
+                    errorBox.Text = "Cannot divide by zero";
                 }
                 catch (Exception ex)
                 {
-                    displayTextbox.Text = "Error! Try again.";
+                    errorBox.Text = "Error! Try again.";
                 }
             }
+            try
+            {
+                var userInput = (!displayTextbox.Text.ToString().Equals("")) ? e.ToString()
+                : "";
+
+                if (userInput.Equals(""))
+                    return;
+
+                ValidateInput(userInput);
+            }
+            catch (InvalidOperatorExxception)
+            {
+                displayTextbox.Text = displayTextbox.Text.Remove(displayTextbox.Text.Length - 1);
+                return;
+            }
+            catch (InvalidInputException)
+            {
+                displayTextbox.Text = displayTextbox.Text.Remove(displayTextbox.Text.Length - 1);
+                return;
+            }
+            catch (NotANumberException)
+            {
+                displayTextbox.Text = displayTextbox.Text.Remove(displayTextbox.Text.Length - 1);
+                return;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            
             
 
         }
-
-        private void calcButton_Click(object sender, RoutedEventArgs e)
+        private void CalcButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Calculate();
+                String input = displayTextbox.Text.ToString();
+                if (IsRo) { Utils.SwitchLang(ref input); }
+
+                input = Utils.Solve(input.Replace(",", "")).ToString();
+                Utils.AddComma(ref input, IsRo);
+                displayTextbox.Text = input;
+
             }
             catch (DivideByZeroException ex) {
 
@@ -74,75 +131,59 @@ namespace Calculator
                 displayTextbox.Text = "Error! Try again.";
             }
         }
-
-        private void Calculate()
-        {
-            //int opPos = 0;
-            //double value1 = 0;
-            //double value2 = 0;
-            //double result = 0;
-            //string op = "";
-
-            //if (displayTextbox.Text.Contains("*"))
-            //{
-            //    opPos = displayTextbox.Text.IndexOf("*");
-            //}
-            //else if (displayTextbox.Text.Contains("/"))
-            //{
-            //    opPos = displayTextbox.Text.IndexOf("/");
-            //}
-            //else if (displayTextbox.Text.Contains("+"))
-            //{
-            //    opPos = displayTextbox.Text.IndexOf("+");
-            //}
-            //else if (displayTextbox.Text.Contains("-"))
-            //{
-            //    opPos = displayTextbox.Text.IndexOf("-");
-            //}
-
-
-            //value1 = Double.Parse(displayTextbox.Text.Substring(0, opPos));
-            //op = displayTextbox.Text.Substring(opPos, 1);
-            //value2 = Double.Parse(displayTextbox.Text.Substring(opPos + 1, displayTextbox.Text.Length - opPos - 1));
-
-            //if (op == "*")
-            //{
-            //    result = cal.multiply(value1, value2);
-            //    displayTextbox.Text = result.ToString();
-            //}
-            //else if (op == "/")
-            //{
-            //    if (value2 == 0)
-            //    {
-            //        displayTextbox.Text = "Cannot divide by zero!";
-            //    }
-            //    else
-            //    {
-            //        result = cal.divide(value1, value2);
-            //        displayTextbox.Text = result.ToString();
-            //    }
-            //}
-            //else if (op == "+")
-            //{
-            //    result = cal.add(value1, value2);
-            //    displayTextbox.Text = result.ToString();
-            //}
-            //else if (op == "-")
-            //{
-            //    result = cal.subtract(value1, value2);
-            //    displayTextbox.Text = result.ToString();
-            //}
-
-            displayTextbox.Text = calculator.Solve(displayTextbox.Text).ToString(); 
-
-            
-        }
-
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             displayTextbox.Text = "";
         }
+        private void ValidateInput(string userInput) {
 
-        
+            var formerInput = (!displayTextbox.Text.ToString().Equals("")) ? displayTextbox.Text[displayTextbox.Text.Length - 1].ToString()
+                : "";
+
+            if (formerInput.Equals(""))
+                return;
+
+            Regex operators = new Regex(@"[+\/\-*]");
+            Regex alpha = new Regex(@"^[a-zA-Z\s]*$");
+            Regex numeric = new Regex("[0-9]");
+
+            
+            if (alpha.IsMatch(userInput)) {
+                throw new InvalidInputException(userInput);
+            }
+            if (operators.IsMatch(formerInput) && !numeric.IsMatch(userInput)) {
+                throw new NotANumberException(userInput);
+            }
+            if (operators.IsMatch(formerInput) && operators.IsMatch(userInput)) {
+                throw new InvalidOperatorExxception(userInput);
+            }
+
+
+
+        }
+
+        private void langButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            String input = displayTextbox.Text.ToString();
+
+            if (IsRo) {
+                IsRo = false;
+                langButton.Content = "EN";
+                decPointButton.Content = ".";
+
+                Utils.SwitchLang(ref input);
+                displayTextbox.Text = input;
+                return;
+            }
+
+            IsRo = true;
+            langButton.Content = "RO";
+            decPointButton.Content = ",";
+
+            Utils.SwitchLang(ref input);
+            displayTextbox.Text = input;
+
+        }
     }
 }
